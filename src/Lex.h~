@@ -39,6 +39,5 @@ void LexOpen(const char *filepath);
 void LexClose();
 void LexNextDescriptor(struct LexDescriptor *descriptor);
 struct LexDescriptor *LexNext();
-struct LexDescriptor *LexPeekNext();
 
 #endif

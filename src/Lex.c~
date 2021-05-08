@@ -26,7 +26,6 @@ struct LexDescriptor *LexPeekNext() {
     I pos = ftell(input);
     struct LexDescriptor *descriptor = LexNext();
     fseek(input, pos, SEEK_SET);
-    return descriptor;
 }
 
 void LexOpen(const char *filepath) {

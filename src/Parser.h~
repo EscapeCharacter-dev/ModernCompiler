@@ -29,5 +29,6 @@ struct Node {
 };
 
 struct Node *Parse(const char *filepath);
+struct Node *ParsePrecedence(I ptp);
 
 #endif

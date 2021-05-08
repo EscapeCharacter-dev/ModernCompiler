@@ -12,7 +12,7 @@ static struct Node *CreateNode(struct Node *left, struct Node *right, struct Lex
 }
 
 static struct Node *ParsePrimary();
-static struct Node *ParsePrecedence(I ptp);
+struct Node *ParsePrecedence(I ptp);
 
 static I Arithm(I operator) {
     switch (operator) {
