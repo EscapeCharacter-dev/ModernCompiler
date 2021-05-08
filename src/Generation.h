@@ -1,24 +1,26 @@
 #ifndef GENERATION_H
 #define GENERATION_H
 
-typedef int WI; // walking "info"
-
-typedef void (*OnPrepare)();
-typedef void (*OnAfterwards)();
-typedef int (*OnAdd)(int left, int right);
-typedef int (*OnSub)(int left, int right);
-typedef int (*OnMul)(int left, int right);
-typedef int (*OnDiv)(int left, int right);
-typedef int (*OnMod)(int left, int right);
+#include "Types.h"
 
 struct GeneratorClass {
-    OnPrepare Prepare;
-    OnAfterwards Afterwards;
-    OnAdd Add;
-    OnSub Sub;
-    OnMul Mul;
-    OnDiv Div;
-    OnMod Mod;
+    void (*Prepare)();
+    void (*Afterwards)();
+    I (*Add)(I left, I right);
+    I (*Sub)(I left, I right);
+    I (*Mul)(I left, I right);
+    I (*Div)(I left, I right);
+    I (*Mod)(I left, I right);
+    I (*And)(I left, I right);
+    I (*XOr)(I left, I right);
+    I (*Or)(I left, I right);
+    I (*LAnd)(I left, I right);
+    I (*LOr)(I left, I right);
+    I (*Load)(I64 value);
+    I (*Neg)(I left);
+    I (*Not)(I left);
+    I (*BNot)(I left);
+    void (*EndStatement)();
 };
 
 #endif

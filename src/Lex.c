@@ -29,6 +29,12 @@ struct LexDescriptor *LexPeekNext() {
     return descriptor;
 }
 
+static U8 PeekChar() {
+    U8 ret = fgetc(input);
+    fseek(input, -1, SEEK_CUR);
+    return ret;
+}
+
 void LexOpen(const char *filepath) {
     input = fopen(filepath, "r");
     if (!input) {
@@ -38,6 +44,7 @@ void LexOpen(const char *filepath) {
 }
 
 void LexNextDescriptor(struct LexDescriptor *descriptor) {
+    __label__ ret;
     I c = fgetc(input);
     if (isspace(c)) {
         while (isspace((c = fgetc(input))));
@@ -46,47 +53,99 @@ void LexNextDescriptor(struct LexDescriptor *descriptor) {
     case EOF:
         descriptor->Character = 0;
         descriptor->Kind = LEX_TOK_EOF;
-        return;
+        goto ret;
     case '+':
-        descriptor->Character = c;
-        descriptor->Kind = LEX_TOK_PLUS;
-        return;
+        if (PeekChar() == '+') {
+            fseek(input, 1, SEEK_CUR);
+            descriptor->Character = 0;
+            descriptor->Kind = LEX_TOK_PLUSPLUS;
+        } else {
+            descriptor->Character = c;
+            descriptor->Kind = LEX_TOK_PLUS;
+        }
+        goto ret;
     case '-':
-        descriptor->Character = c;
-        descriptor->Kind = LEX_TOK_MINUS;
-        return;
+        if (PeekChar() == '-') {
+            fseek(input, 1, SEEK_CUR);
+            descriptor->Character = 0;
+            descriptor->Kind = LEX_TOK_MINUSMINUS;
+        } else {
+            descriptor->Character = c;
+            descriptor->Kind = LEX_TOK_MINUS;
+        }
+        goto ret;
     case '*':
         descriptor->Character = c;
         descriptor->Kind = LEX_TOK_STAR;
-        return;
+        goto ret;
     case '/':
         descriptor->Character = c;
         descriptor->Kind = LEX_TOK_SLASH;
-        return;
+        goto ret;
     case '%':
         descriptor->Character = c;
         descriptor->Kind = LEX_TOK_PERCENT;
-        return;
+        goto ret;
+    case '^':
+        descriptor->Character = c;
+        descriptor->Kind = LEX_TOK_HELM;
+        goto ret;
+    case '&':
+        if (PeekChar() == '&') {
+            fseek(input, 1, SEEK_CUR);
+            descriptor->Character = 0;
+            descriptor->Kind = LEX_TOK_AMPERSANDS;
+        } else {
+            descriptor->Character = c;
+            descriptor->Kind = LEX_TOK_AMPERSAND;
+        }
+        goto ret;
+    case '|':
+        if (PeekChar() == '|') {
+            fseek(input, 1, SEEK_CUR);
+            descriptor->Character = 0;
+            descriptor->Kind = LEX_TOK_PIPES;
+        } else {
+            descriptor->Character = c;
+            descriptor->Kind = LEX_TOK_PIPE;
+        }
+        goto ret;
     case '(':
         descriptor->Character = c;
         descriptor->Kind = LEX_TOK_OPARENT;
-        return;
+        goto ret;
     case ')':
         descriptor->Character = c;
         descriptor->Kind = LEX_TOK_CPARENT;
+        goto ret;
+    case '!':
+        descriptor->Character = c;
+        descriptor->Kind = LEX_TOK_BANG;
+        goto ret;
+    case '~':
+        descriptor->Character = c;
+        descriptor->Kind = LEX_TOK_TILDA;
+        goto ret;
+    case ';':
+        descriptor->Character = c;
+        descriptor->Kind = LEX_TOK_SEMI;
+        goto ret;
     default:
         if (isdigit(c)) {
             I32 value = scanI32(c);
             descriptor->Character = 0;
             descriptor->Kind = LEX_TOK_LINT;
             descriptor->Value.AsI32 = value;
-            return;
+            fseek(input, -1, SEEK_CUR);
+            goto ret;
         }
         fprintf(stderr, "Unknown character %c\n", c);
         descriptor->Character = c;
         descriptor->Kind = LEX_TOK_BAD;
-        return;
+        goto ret;
     }
+ret:
+    return;
 }
 
 struct LexDescriptor *LexNext() {
